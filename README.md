@@ -10,20 +10,20 @@
 
 **Discord Pyhon Bot**
 
-提供一個乾淨的基本骨架，快速的開始一隻新的機器人開發
+提供一個簡易且基本的機器人以開發
 
-- For (初學者/開發者)
+- For 初學者 or 開發者
 - Cog 架構
-- Bot指令/斜線命令/類別/功能 分離
+- Bot指令/斜線命令/類別, 分離/功能
 - Error Handler 、 Logger 、 Gloable Function 、 Checker
 
 <br>
 
 ## :inbox_tray: Installation 安裝指南
-> 運行環境 建議 `Python 3.10` / `discord.py 2.1` / `Pycord 2.2.3` 以上(含)
+> 運行環境 建議 `Python 3.10` / `discord.py 2.1.0` / `Pycord 2.3.3` 以上(含)
 
 1. 下載整個專案
-2. 安裝 `Python 3.10`
+2. 安裝 `Python 3.11`
 3. 解壓後自行修改設定檔 `setting.json` 裡的資料
 4. 在終端機執行 `pip install discord.py` 和 `pip install -U git+https://github.com/Pycord-Development/pycord`
 5. 運行 `python bot.py`
@@ -36,18 +36,31 @@
 ------------------------------------
 - bot.py # bot 啟動主程式
 - setting.json # 設定檔
+- .env # 機器人TOKEN
 
 
 /cmds # 放置所有 Cog 指令
 ------------------------------------
-- main.py  #主要指令區
-- event.py # 所有 event 觸發性事件指令區
-- music.py # 音樂功能指令區
+- admin.py  # 管理用指令(皆須有權限才可使用)
+- economy.py  # 經濟指令
+- event.py  # 所有 event 觸發性事件指令區
+- fun.py    # 娛樂用途指令
+- main.py   # 主要指令區
+- music.py  # 音樂功能
+- react.py  # 反映事件
+- slash.py  # 所有斜線命令
+- task.py   # 定時任務
+
+
+/modules # 放置所有模組
+------------------------------------
+StatusChanger.py  # 機器人狀態定時變更
+DirectMessages.py # 使用機器人私訊成員
 
 
 /core  #放置類別、核心通用功能
 ------------------------------------
 - classes.py # 主要類別區
-- check.py # 自定全域指令檢查器
-- error.py # 預設、自訂 錯誤管理器
+<!-- - check.py # 自定全域指令檢查器
+- error.py # 預設、自訂 錯誤管理器 -->
 ```

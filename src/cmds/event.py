@@ -6,11 +6,11 @@ import json, yaml
 
 time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
 
-with open('setting.json', mode='r',encoding='utf8') as file:
+with open('setting.jsonc', mode='r',encoding='utf8') as file:
     data = json.load(file)
 
-with open('cmds/join_guilds.json', mode='r', encoding='utf8') as f:
-    guilds_dict = json.load(f)
+with open('cmds/join_guilds.json', mode='r', encoding='utf8') as guild:
+    guilds_dict = json.load(guild)
 
 with open('cmds/reaction.json', mode='r', encoding='utf8') as a:
     reaction = json.load(a)
@@ -18,22 +18,22 @@ with open('cmds/reaction.json', mode='r', encoding='utf8') as a:
 class Event(Cog_Extension):
     print(f'{time} Event load!')
 
-    """取得Json API 資料"""
+    # """取得Json API 資料"""
 
-    @commands.command()
-    async def test(self, ctx):
-        response = requests.get('http://127.0.0.1:3000/posts/1')
+    # @commands.command()
+    # async def test(self, ctx):
+    #     response = requests.get('http://127.0.0.1:3000/posts/1')
 
-        # 取得原來資料
-        data = response.json()
+    #     # 取得原來資料
+    #     data = response.json()
 
-        # 新增一筆資料到原來資料裡
-        data['new'] = "This is a new data"
+    #     # 新增一筆資料到原來資料裡
+    #     data['new'] = "This is a new data"
 
-        updata = requests.put('http://127.0.0.1:3000/posts/1', json = data)
-        await ctx.send(updata)
+    #     updata = requests.put('http://127.0.0.1:3000/posts/1', json = data)
+    #     await ctx.send(updata)
 
-    """"""
+    # """"""
 
 ##
 
@@ -105,16 +105,61 @@ class Event(Cog_Extension):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        channel_id = guilds_dict[member.guild.id]
-        await self.bot.get_channel(int(channel_id)).send(f'歡迎 {member.mention} 加入伺服器!🎉')
+        folder = f'cmds/guild'
+        guild_folder = f'{folder}/{member.guild.id}'
+        on_member = f'{guild_folder}/on_member.json'
+        if not os.path.exists(guild_folder):
+            # os.makedirs(guild_folder)
+            pass
+        pass
+        if os.path.isfile(f'{on_member}'):
+            with open(f'{on_member}', mode='r', encoding='utf8') as filt:
+                odata = json.load(filt)
+                channel_id = odata['welcome_channel']
+                await self.bot.get_channel(int(channel_id)).send(f'歡迎 {member.mention} 加入伺服器!🎉')
+        elif not os.path.isfile(f'{on_member}'):
+            pass
+        else:
+            print("on_member 發生錯誤")
 
-    @commands.command(help='設定歡迎訊息的發送頻道')
+    @commands.command(help="設定歡迎訊息的發送頻道")
     @commands.has_permissions(manage_messages = True)
     async def set_welcome_channel(self, ctx, channel: discord.TextChannel):
-        guilds_dict[ctx.guild.id] = channel.id
-        with open('cmds/join_guilds.json', mode='w', encoding='utf8') as f:
-            json.dump(guilds_dict, f, indent=4, ensure_ascii=False)
-        await ctx.send(f'將 "{ctx.message.guild.name}" 的歡迎訊息發送到 "{channel.name}"')
+        folder = f'cmds/guild'
+        guild_folder = f'{folder}/{ctx.guild.id}'
+        on_member = f'{guild_folder}/on_member.json'
+        if not os.path.exists(guild_folder):
+            os.makedirs(guild_folder)
+        if not os.path.isfile(f'{on_member}'):
+            with open (f'{on_member}', mode="a+", encoding="utf8") as filt:
+                odata = {"welcome_channel":f'{channel.id}'}
+                json.dump(odata, filt, indent=4, ensure_ascii=False)
+            await ctx.send(f'將 "{ctx.message.guild.name}" 的歡迎訊息發送到 {channel.mention}')
+        elif os.path.isfile(f'{on_member}'):
+            with open(f'{on_member}', mode='r', encoding='utf8') as filt:
+                gg = json.load(filt)
+            gg['welcome_channel'] = f'{channel.id}'
+            with open(f'{on_member}', mode="w", encoding="utf8") as filt:
+                json.dump(gg, filt, indent=4, ensure_ascii=False)
+            await ctx.send(f'將 "{ctx.message.guild.name}" 的歡迎訊息更改為 {channel.mention}')
+        else:
+            print("set_welcome_channel 發生錯誤")
+
+
+    # @commands.command(help='設定歡迎訊息的發送頻道')
+    # @commands.has_permissions(manage_messages = True)
+    # async def set_welcome_channel(self, ctx, channel: discord.TextChannel):
+    #     guilds_dict[ctx.guild.id] = channel.id
+    #     with open('cmds/join_guilds.json', mode='w', encoding='utf8') as f:
+    #         json.dump(guilds_dict, f, indent=4, ensure_ascii=False)
+    #     await ctx.send(f'將 "{ctx.message.guild.name}" 的歡迎訊息發送到 "{channel.name}"')
+
+
+    # @commands.Cog.listener()
+    # async def on_member_remove(self, member):
+    #     print(f'{member} leave!')
+    #     channel = self.bot.get_channel(int(1057647364749393970))
+    #     await channel.send(f'{member.name} 離開了伺服器qq')
 
     # Optional:
     # So if your bot leaves a guild, the guild is removed from the dict
@@ -131,8 +176,6 @@ class Event(Cog_Extension):
 
     """審核日誌"""
 
-
-
     @commands.Cog.listener()
     async def on_message_delete(self, msg):
         channel = self.bot.get_channel(1058926594997112922)
@@ -146,75 +189,5 @@ class Event(Cog_Extension):
 
     """"""
 
-##
-
-    """"""
-
-    # @commands.Cog.listener()
-    # async def on_command_error(self, ctx, command_error):
-    #     #檢查指令是否有自己的error handler：如果有就略過
-    #     if hasattr(ctx.command, 'on_error'):
-    #        return
-    #     if isinstance(command_error, commands.errors.MissingRequiredArgument):
-    #         await ctx.send(f'缺少必要的參數: {command_error}')
-    #     elif isinstance(command_error, commands.errors.CommandNotFound):
-    #         await ctx.send("指令未找到")
-    #     else:
-    #        await ctx.send(f'發生錯誤: {command_error}')
-
-    """"""
-
 def setup(bot):
     bot.add_cog(Event(bot))
-
-
-
-    # @commands.Cog.listener()
-    # async def on_message(self, msg):
-    #     if 'kg鞍' in  msg.content and msg.author != self.bot.user:
-    #         kg鞍 = ['誰叫我', '我在這~', '怎麼了', 'none', 'none', 'none']
-    #         random_choice_kg鞍 = random.choice(kg鞍)
-    #         if random_choice_kg鞍 != 'none':
-    #             await msg.channel.send(random_choice_kg鞍)
-    
-    # @commands.Cog.listener()
-    # async def on_message(self, msg):
-    #     if '臭蛋蛋' in msg.content and msg.author != self.bot.user:
-    #         await msg.channel.send(f'<@1017630139019968643>')
-
-    # @commands.Cog.listener()
-    # async def on_message(self, msg):
-    #    if 'kg鞍' in  msg.content and msg.author != self.bot.user:
-    #        kg鞍 = ['誰叫我', '我在這~', '怎麼了', '']
-    #        await msg.channel.send(random.choice(kg鞍))
-    #    if '...' in  msg.content and msg.author != self.bot.user:
-    #        emo = ['......', '']
-    #        await msg.channel.send(random.choice(emo))
-
-#-----
-
-    # @commands.Cog.listener()
-    # async def on_member_join(self, member):
-    #     print(f'{member} join!')
-    #     channel = self.bot.get_channel(int(1057647364749393970))
-    #     await channel.send(f'歡迎 {member.name} 加入伺服器!')
-
-    # @commands.Cog.listener()
-    # async def on_member_remove(self, member):
-    #     print(f'{member} leave!')
-    #     channel = self.bot.get_channel(int(1057647364749393970))
-    #     await channel.send(f'{member.name} 離開了伺服器qq')
-
-#------
-
-    # @commands.Cog.listener()
-    # async def on_command_error(self, ctx, command_error):
-    #     #檢查指令是否有自己的error handler：如果有就略過
-    #     if hasattr(ctx.command, 'on_error'):
-    #        return
-    #     if isinstance(command_error, commands.errors.MissingRequiredArgument):
-    #         await ctx.send(f'缺少必要的參數: {command_error}')
-    #     elif isinstance(command_error, commands.errors.CommandNotFound):
-    #         await ctx.send("指令未找到")
-    #     else:
-    #        await ctx.send(f'發生錯誤: {command_error}')

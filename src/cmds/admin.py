@@ -7,7 +7,7 @@ import secrets
 
 time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
 
-with open('setting.json', mode='r',encoding='utf8') as file:
+with open('setting.jsonc', mode='r',encoding='utf8') as file:
     data = json.load(file)
 
 class Admin(Cog_Extension):

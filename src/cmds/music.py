@@ -12,7 +12,7 @@ from youtube_dl import YoutubeDL
 
 time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
 
-with open('setting.json', mode='r',encoding='utf8') as file:
+with open('setting.jsonc', mode='r',encoding='utf8') as file:
     data = json.load(file)
 
 class Music(Cog_Extension):
@@ -63,15 +63,10 @@ class Music(Cog_Extension):
                 voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                 voice.is_playing()
                 await ctx.reply('撥放中...')
-            # check if the bot is already playing
-            # else:
-            #     await ctx.send("機器人正在撥放音樂 (對列系統還沒寫)")
-            #     return
         else:
-            search = requests.get(data['youtube_api_url'] + msg + '&key=' + data['youtube_api_key'] + '&type=video&maxResults=1')
+            search = requests.get("https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + msg + '&key=' + data['yt_api_key'] + '&type=video&maxResults=1')
             jdata = search.json()
-            url = data['youtube_watch'] + jdata['items'][0]['id']['videoId']
-            # await ctx.send(url)
+            url = "https://www.youtube.com/watch?v=" + jdata['items'][0]['id']['videoId']
 
             # use 'url' to play music
             YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
@@ -84,16 +79,12 @@ class Music(Cog_Extension):
                 voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                 voice.is_playing()
                 await ctx.reply('撥放中...')
-            # check if the bot is already playing
-            # else:
-            #     await ctx.send("機器人正在撥放音樂 (對列系統還沒寫)")
-            #     return
 
     @commands.command(help="搜尋YouTube影片")
     async def search(self, ctx, search):
-        response = requests.get(data['youtube_api_url'] + search + '&key=' + data['youtube_api_key'] + '&type=video&maxResults=1')
+        response = requests.get("https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + search + '&key=' + data['yt_api_key'] + '&type=video&maxResults=1')
         jdata = response.json()
-        url = data['youtube_watch'] + jdata['items'][0]['id']['videoId']
+        url = "https://www.youtube.com/watch?v=" + jdata['items'][0]['id']['videoId']
         await ctx.send(url)
 
 # command to resume voice if it is paused

@@ -8,35 +8,11 @@ from discord.ext.commands import clean_content
 
 time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
 
-with open('setting.json', mode='r',encoding='utf8') as file:
+with open('setting.jsonc', mode='r',encoding='utf8') as file:
     data = json.load(file)
 
 class Fun(Cog_Extension):
     print(f'{time} Fun load!')
-
-    @commands.command(help="每日簽到")
-    @commands.cooldown(rate=1, per=86400, type=commands.BucketType.user)
-    async def daily(self, ctx):
-        await ctx.reply("那個臭卓卓還沒寫")
-
-    @commands.command(help="領取你一小時的薪水")
-    @commands.cooldown(rate=1, per=3600, type=commands.BucketType.user)
-    async def work(self, ctx):
-        money = random.randint(50, 1000)
-        await ctx.reply(f'<@{ctx.message.author.id}>，你從上一份工作中獲得 {money} 元。請等一小時後再次使用此指令')
-
-    @commands.command(help="猜數字")
-    async def guess(self, ctx):
-        await ctx.reply("請猜1-100之間的數字(未完成)")
-        # ans = random.randint(1, 100)
-        # while True:
-        #     if num == ans:
-        #         await ctx.send("答對了!!")
-        #         break
-        #     elif num > ans:
-        #         await ctx.send("小一點")
-        #     elif num < ans:
-        #         await ctx.send("大一點")
 
     @commands.command(help="")
     async def f(self, ctx, *, text: clean_content = None):
@@ -75,24 +51,6 @@ class Fun(Cog_Extension):
             emoji = "💞"
 
         await ctx.send(f"**{user.name}** is **{hot:.2f}%** hot {emoji}")
-
-    @commands.command(name="老虎機", aliases=['slots', 'bet'])
-    @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.user)
-    async def slot(self, ctx):
-        """ Roll the slot machine """
-        emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
-        a = random.choice(emojis)
-        b = random.choice(emojis)
-        c = random.choice(emojis)
-
-        slotmachine = f"**[ {a} {b} {c} ]\n{ctx.author.name}**,"
-
-        if a == b == c:
-            await ctx.send(f"{slotmachine} 全部中獎, 你贏了! 🎉")
-        elif (a == b) or (a == c) or (b == c):
-            await ctx.send(f"{slotmachine} 連續2次, 你贏了! 🎉")
-        else:
-            await ctx.send(f"{slotmachine} 不匹配, 你輸了 😢")
 
     @commands.command(help="給某人一杯啤酒! 🍻")
     async def beer(self, ctx, user: discord.Member = None, *, reason: clean_content = ""):

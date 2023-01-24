@@ -13,8 +13,11 @@ from youtube_dl import YoutubeDL
 
 time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
 
-with open('setting.json', mode='r',encoding='utf8') as file:
+with open('setting.jsonc', mode='r',encoding='utf8') as file:
     data = json.load(file)
+
+with open('version.json', mode='r',encoding='utf8') as v:
+    version = json.load(v)
 
 class Slash(Cog_Extension):
     print(f'{time} Slash load!')
@@ -68,10 +71,12 @@ class Slash(Cog_Extension):
     async def ping(self, ctx):
         await ctx.respond(f'機器人延遲 {round(self.bot.latency*1000)} ms\nAPI延遲 {round(self.bot.ws.latency*1000)} ms')
 
-    @commands.slash_command(description="學你說話")
+    @commands.slash_command(description="讓我幫你說話")
     async def say(self, ctx, msg):
-        if msg != ('@here') or msg != ('@everyone'):
+        if msg != ("@everyone") and msg != ("@here"):
             await ctx.respond(f'訊息已傳送', ephemeral=True)
+            async with ctx.typing():
+                await asyncio.sleep(4)
             await ctx.send(msg)
         else:
             await ctx.respond(f'{msg.author.mention}你不可以@everyone或@here!!')
@@ -96,7 +101,7 @@ class Slash(Cog_Extension):
         embed.add_field(name="開發者 Developers", value="redbean0721#5582", inline=False)
         embed.add_field(name="源碼 Source", value="https://github.com/redbean0721/DiscordBot", inline=False)
         embed.add_field(name="協助 Support Server", value="https://discord.gg/9hwuNYXA4q", inline=True)
-        embed.add_field(name="版本 Version", value="1.0", inline=False)
+        embed.add_field(name="版本 Version", value=(version['version']), inline=False)
         embed.add_field(name="使用語言", value="discord.py", inline=True)
         embed.add_field(name="指令 Prefix", value=(data['prefix']), inline=False)
         embed.add_field(name="服務中的伺服器 Server count", value=f"{len(self.bot.guilds)}", inline=False)
@@ -144,15 +149,11 @@ class Slash(Cog_Extension):
                 voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                 voice.is_playing()
                 await ctx.respond('撥放中...')
-            # check if the bot is already playing
-            # else:
-            #     await ctx.send("機器人正在撥放音樂 (對列系統還沒寫)")
-            #     return
+
         else:
-            search = requests.get(data['youtube_api_url'] + msg + '&key=' + data['youtube_api_key'] + '&type=video&maxResults=1')
+            search = requests.get("https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + msg + '&key=' + data['yt_api_key'] + '&type=video&maxResults=1')
             jdata = search.json()
-            url = data['youtube_watch'] + jdata['items'][0]['id']['videoId']
-            # await ctx.send(url)
+            url = "https://www.youtube.com/watch?v=" + jdata['items'][0]['id']['videoId']
 
             # use 'url' to play music
             YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
@@ -165,16 +166,12 @@ class Slash(Cog_Extension):
                 voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
                 voice.is_playing()
                 await ctx.respond('撥放中...')
-            # check if the bot is already playing
-            # else:
-            #     await ctx.send("機器人正在撥放音樂 (對列系統還沒寫)")
-            #     return
 
     @commands.slash_command(description="搜尋YouTube影片")
     async def search(self, ctx, search):
-        response = requests.get(data['youtube_api_url'] + search + '&key=' + data['youtube_api_key'] + '&type=video&maxResults=1')
+        response = requests.get("https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + search + '&key=' + data['yt_api_key'] + '&type=video&maxResults=1')
         jdata = response.json()
-        url = data['youtube_watch'] + jdata['items'][0]['id']['videoId']
+        url = "https://www.youtube.com/watch?v=" + jdata['items'][0]['id']['videoId']
         await ctx.respond(url)
 
 # command to resume voice if it is paused

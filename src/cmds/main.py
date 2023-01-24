@@ -7,15 +7,17 @@ import secrets
 
 time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
 
-with open('setting.json', mode='r',encoding='utf8') as file:
+with open('setting.jsonc', mode='r',encoding='utf8') as file:
     data = json.load(file)
+
+with open('version.json', mode='r',encoding='utf8') as v:
+    version = json.load(v)
 
 class Main(Cog_Extension):
     print(f'{time} Main load!')
 
     @commands.command(help="跟你say Hellow")
     async def hi(self, ctx):
-        # hi = ['誰叫我', '我在這~', '怎麼了', '?']
         await ctx.reply(random.choice(['誰叫我', '我在這~', '怎麼了', '?']))
 
     @commands.command(help="ping我看我ㄉ延遲")
@@ -30,7 +32,7 @@ class Main(Cog_Extension):
                 await asyncio.sleep(4)
             await ctx.send(msg)
         else:
-            await ctx.reply(f'<@{ctx.message.author.id}> 你不可以tag everyone或here!!')
+            await ctx.reply(f'{msg.author.mention} 你不可以tag everyone或here!!')
     
     @commands.command(help="讓我私訊使用者")
     async def dm(self, msg, member: discord.Member):
@@ -40,7 +42,7 @@ class Main(Cog_Extension):
     @commands.has_permissions(manage_messages = True)
     async def clear(self, ctx, num: int):
         await ctx.channel.purge(limit=num+1)
-        await ctx.send(f'<@{ctx.message.author.id}> 已刪除 {num} 則訊息')
+        await ctx.send(f'{ctx.author.mention} 已刪除 {num} 則訊息')
 
     @commands.command(help="隨機生成一串密碼")
     async def password(self, ctx, n_bytes: int = 18):
@@ -56,7 +58,7 @@ class Main(Cog_Extension):
         embed.add_field(name="開發者 Developers", value="redbean0721#5582", inline=False)
         embed.add_field(name="源碼 Source", value="https://github.com/redbean0721/DiscordBot", inline=False)
         embed.add_field(name="協助 Support Server", value="https://discord.gg/9hwuNYXA4q", inline=True)
-        embed.add_field(name="版本 Version", value="1.0", inline=False)
+        embed.add_field(name="版本 Version", value=(version['version']), inline=False)
         embed.add_field(name="使用語言", value="discord.py", inline=True)
         embed.add_field(name="指令 Prefix", value=(data['prefix']), inline=False)
         embed.add_field(name="服務中的伺服器 Server count", value=f"{len(self.bot.guilds)}", inline=False)
@@ -64,7 +66,6 @@ class Main(Cog_Extension):
         embed.add_field(name="API延遲", value=f'{round(self.bot.ws.latency*1000)} ms', inline=False)
         embed.set_footer(text="Made with ❤")
         await ctx.send(embed=embed)
-
 
 def setup(bot):
     bot.add_cog(Main(bot))

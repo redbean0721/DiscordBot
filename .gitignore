@@ -1,8 +1,8 @@
 __pycache__
 log
+.env
+guild
 task.json
 join_guilds.json
 reaction.json
 setting.json
-SuggestionsModule.txt
-SuggestionsModuleConfig.yml
