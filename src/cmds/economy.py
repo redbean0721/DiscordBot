@@ -25,6 +25,8 @@ MIN = edata["MIN"]
 folder = f'cmds/guild'
 
 today = datetime.date.today()
+now_hour = datetime.datetime.now().strftime('%H')
+now_ms = datetime.datetime.now().strftime('%M:%S')
 
 class Economy(Cog_Extension):
     print(f'{time} Economy load!')
@@ -40,7 +42,7 @@ class Economy(Cog_Extension):
         elif not os.path.isfile(f'{filepath}.json'):
             a = await ctx.reply('請稍後, 正在為你建立帳號...')
             with open (f'{filepath}.json',mode="a+",encoding="utf-8") as filt:
-                mdata = {"last_time":"0","money": NEW}
+                mdata = {"last_time":"0","last_hour":"","last_ms":"","money": NEW}
                 json.dump(mdata, filt, indent=4, ensure_ascii=False)
             await asyncio.sleep(1)
             await a.edit(f"{ctx.author.mention} 帳號建立完成, 你目前有 `{mdata['money']}` 元")
@@ -58,6 +60,7 @@ class Economy(Cog_Extension):
                 money = udata['money']
                 last_time = udata['last_time']
                 if str(today) == str(last_time):
+                    await asyncio.sleep(1)
                     await a.edit("你今天已經簽到過了")
                 else:
                     up_money = random.randrange(int(Daily_MIN), int(Daily_MAX))
@@ -71,6 +74,7 @@ class Economy(Cog_Extension):
                         await asyncio.sleep(1)
                     await a.edit(f'本日簽到獎勵: `{up_money}` 元, 你目前有 `{new_money}` 元')
         elif not os.path.isfile(filepath):
+            await asyncio.sleep(1)
             await a.edit(f"{ctx.author.mention} 你沒有帳號,請用 `!signup` 創建一個")
         else:
             await ctx.reply("發生錯誤")
@@ -88,23 +92,37 @@ class Economy(Cog_Extension):
             await ctx.reply("發生錯誤")
 
     @commands.command(help="領取你一小時的薪水")
-    @commands.cooldown(rate=1, per=3600, type=commands.BucketType.user)
+    # @commands.cooldown(rate=1, per=86400, type=commands.BucketType.user)
     async def work(self, ctx):
-        await ctx.send("功能尚未完成")
-        # filepath = f'{folder}/{ctx.guild.id}/economy/{ctx.author.id}.json'
-        # if os.path.isfile(filepath):
-        #     with open(f'{filepath}', mode='r', encoding='utf8') as user:
-        #         udata = json.load(user)
-        #     up_money = random.randint(int(Work_MIN), int(Work_MAX))
-        #     new_money = int(udata['money']) + int(up_money)
-        #     udata['money'] = new_money
-        #     with open(f'{filepath}', mode='w', encoding='utf8') as user:
-        #         json.dump(udata, user, indent=4, ensure_ascii=False)
-        #     await ctx.reply(f'{ctx.message.author.mention}，你賺ㄌ `{up_money}` 元。繼續打工, 一小時後再來\n你目前有 `{new_money}` 元')
-        # elif not os.path.isfile(filepath):
-        #     await ctx.reply(f"{ctx.author.mention}你沒有帳號,請用 `!signup` 創建一個")
-        # else:
-        #     await ctx.send("發生錯誤")
+        a = await ctx.reply('排隊中...')
+        filepath = f'{folder}/{ctx.guild.id}/economy/{ctx.author.id}.json'
+        if os.path.isfile(filepath):
+            with open(f'{filepath}', mode='r', encoding='utf8') as user:
+                udata = json.load(user)
+                money = udata['money']
+                last_hour = udata['last_hour']
+                last_ms = udata['last_ms']
+                if str(now_hour) == str(last_hour) or str(now_ms) == str(last_ms):
+                    await asyncio.sleep(1)
+                    await a.edit("你已經在打工了")
+                else:
+                    up_money = random.randrange(int(Work_MIN), int(Work_MAX))
+                    new_money = int(money) + int(up_money)
+                    udata['money'] = new_money
+                    with open(f'{filepath}', mode='w', encoding='utf8') as user:
+                        json.dump(udata, user, indent=4, ensure_ascii=False)
+                    udata['last_hour'] = str(now_hour)
+                    with open(f'{filepath}', mode='w', encoding='utf8') as user:
+                        json.dump(udata, user, indent=4, ensure_ascii=False)
+                    udata['last_ms'] = str(now_ms)
+                    with open(f'{filepath}', mode='w', encoding='utf8') as user:
+                        json.dump(udata, user, indent=4, ensure_ascii=False)
+                    await a.edit(f'{ctx.author.mention}，你賺ㄌ `{up_money}` 元。繼續打工, 一小時後再來\n你目前有 `{new_money}` 元')
+        elif not os.path.isfile(filepath):
+            await asyncio.sleep(1)
+            await a.edit(f"{ctx.author.mention} 你沒有帳號,請用 `!signup` 創建一個")
+        else:
+            await ctx.reply("發生錯誤")
 
 
     @commands.command(help="猜數字")
