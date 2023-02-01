@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from core.classes import Cog_Extension
-import asyncio, os, time, datetime, random, logging, requests
+import asyncio, os, time, datetime, random, logging, requests, sys
 import json, yaml
 
 time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
@@ -41,6 +41,23 @@ async def on_command_error(ctx, command_error):
         await ctx.send("指令未找到")
     else:
         await ctx.send(f'發生錯誤: {command_error}')
+
+@bot.command()
+async def close(ctx):
+    if ctx.author.id == int(data['owner_id']):
+        await ctx.send("Closeing bot...")
+        await asyncio.sleep(1)
+        await bot.close()
+    else:
+        await ctx.send(f"{ctx.author.mention} 你沒有權限")
+
+@bot.command()
+async def restart(ctx):
+    if ctx.author.id == int(data['owner_id']):
+        await ctx.send("Restarting bot...")
+        os.execv(sys.executable, ['python'] + sys.argv)
+    else:
+        await ctx.send(f"{ctx.author.mention} 你沒有權限")
 
 # cmds
 @bot.command()
