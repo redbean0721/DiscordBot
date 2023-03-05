@@ -24,9 +24,10 @@
 
 1. 下載整個專案
 2. 安裝 `Python 3.11`
-3. 解壓後自行修改設定檔 `setting.json` 裡的資料
-4. 在終端機執行 `pip install discord.py` 和 `pip install -U git+https://github.com/Pycord-Development/pycord`
-5. 運行 `python bot.py`
+3. 將 `example.env` 重新命名為 `.env` 並將機器人TOKEN填入
+4. 解壓後將 `example_setting.json` 重新命名為 `setting.json` 並自行修改檔案裡的資料
+5. 在終端機執行 `pip install discord.py` 和 `pip install -U git+https://github.com/Pycord-Development/pycord`
+6. 運行 `python bot.py`
 
 <br>
 
@@ -61,6 +62,3 @@ DirectMessages.py # 使用機器人私訊成員
 /core  #放置類別、核心通用功能
 ------------------------------------
 - classes.py # 主要類別區
-<!-- - check.py # 自定全域指令檢查器
-- error.py # 預設、自訂 錯誤管理器 -->
-```

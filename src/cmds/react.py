@@ -4,12 +4,11 @@ from core.classes import Cog_Extension
 import asyncio, os, time, datetime, random, logging, requests
 import json, yaml
 
-time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
-
-with open('setting.jsonc', mode='r',encoding='utf8') as file:
+with open('setting.json', mode='r',encoding='utf8') as file:
     data = json.load(file)
 
 class React(Cog_Extension):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     print(f'{time} React load!')
 
     @commands.command()

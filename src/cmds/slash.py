@@ -11,15 +11,14 @@ from discord import FFmpegPCMAudio
 from discord import TextChannel
 from youtube_dl import YoutubeDL
 
-time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
-
-with open('setting.jsonc', mode='r',encoding='utf8') as file:
+with open('setting.json', mode='r',encoding='utf8') as file:
     data = json.load(file)
 
 with open('version.json', mode='r',encoding='utf8') as v:
     version = json.load(v)
 
 class Slash(Cog_Extension):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     print(f'{time} Slash load!')
 
     """Admin"""

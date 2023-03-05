@@ -5,8 +5,6 @@ from core.classes import Cog_Extension
 import asyncio, os, datetime, random, logging, requests
 import json, yaml
 
-time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
-
 config = yaml.safe_load(open("modules\\StatusChangerConfig.yml", 'r', encoding="utf-8"))
 
 interval = config.get("Change-Interval")
@@ -14,6 +12,7 @@ interval = config.get("Change-Interval")
 class StatusUpdater(Cog_Extension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
         print(f'{time} StatusChanger module ready!')
         self.status = 0
 
@@ -40,6 +39,7 @@ class StatusUpdater(Cog_Extension):
 
     @update_status.before_loop
     async def before_update_status(self):
+        time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
         """Wait for bot to fully start before updating status"""
         await self.bot.wait_until_ready()
         print(f'{time} Launching status updater!')

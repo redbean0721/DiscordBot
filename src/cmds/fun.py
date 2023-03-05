@@ -6,12 +6,11 @@ import json, yaml
 import secrets
 from discord.ext.commands import clean_content
 
-time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
-
-with open('setting.jsonc', mode='r',encoding='utf8') as file:
+with open('setting.json', mode='r',encoding='utf8') as file:
     data = json.load(file)
 
 class Fun(Cog_Extension):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     print(f'{time} Fun load!')
 
     @commands.command(help="")

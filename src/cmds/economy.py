@@ -6,9 +6,7 @@ import json, yaml
 import secrets
 from discord.ext.commands import clean_content
 
-time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
-
-with open('setting.jsonc', mode='r',encoding='utf8') as file:
+with open('setting.json', mode='r',encoding='utf8') as file:
     data = json.load(file)
 
 with open('cmds/EconomyConfig.json', mode='r',encoding='utf8') as efile:
@@ -29,6 +27,7 @@ now_hour = datetime.datetime.now().strftime('%H')
 now_ms = datetime.datetime.now().strftime('%M:%S')
 
 class Economy(Cog_Extension):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     print(f'{time} Economy load!')
 
     @commands.command(help="建立銀行帳號")

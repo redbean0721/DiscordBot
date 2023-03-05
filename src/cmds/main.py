@@ -5,15 +5,14 @@ import asyncio, os, time, datetime, random, logging, requests
 import json, yaml
 import secrets
 
-time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
-
-with open('setting.jsonc', mode='r',encoding='utf8') as file:
+with open('setting.json', mode='r',encoding='utf8') as file:
     data = json.load(file)
 
 with open('version.json', mode='r',encoding='utf8') as v:
     version = json.load(v)
 
 class Main(Cog_Extension):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     print(f'{time} Main load!')
 
     @commands.command(help="跟你say Hellow")

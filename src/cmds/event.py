@@ -4,9 +4,7 @@ from core.classes import Cog_Extension
 import asyncio, os, time, datetime, random, logging, requests
 import json, yaml
 
-time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
-
-with open('setting.jsonc', mode='r',encoding='utf8') as file:
+with open('setting.json', mode='r',encoding='utf8') as file:
     data = json.load(file)
 
 with open('cmds/join_guilds.json', mode='r', encoding='utf8') as guild:
@@ -16,6 +14,7 @@ with open('cmds/reaction.json', mode='r', encoding='utf8') as a:
     reaction = json.load(a)
 
 class Event(Cog_Extension):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     print(f'{time} Event load!')
 
     # """取得Json API 資料"""
@@ -74,6 +73,7 @@ class Event(Cog_Extension):
 ###爛學校討論群🎄 🦌 🛷 🦌🎄
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
+        time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
         # 判斷反應貼圖給予相對應身分組
         if payload.message_id == 1060240402248122459:
             guild = self.bot.get_guild(payload.guild_id) # 取得當前所在伺服器
@@ -86,6 +86,7 @@ class Event(Cog_Extension):
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
+        time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
         # 判斷反應貼圖移除相對應身分組
         if payload.message_id == 1060240402248122459:
             guild = self.bot.get_guild(payload.guild_id) # 取得當前所在伺服器
@@ -178,13 +179,14 @@ class Event(Cog_Extension):
 
     @commands.Cog.listener()
     async def on_message_delete(self, msg):
-        channel = self.bot.get_channel(1058926594997112922)
+        channel = self.bot.get_channel(int(data['delete_message_channel']))
         counter = 1
         async for entry in msg.guild.audit_logs(action=discord.AuditLogAction.message_delete):
             if counter ==1:
                 # await channel.send(entry.user.name)
-                print(f'{time} "{entry.user}" 刪除了 "{msg.guild}" 伺服器 "{str(msg.author)}" 的訊息, 內容: "{str(msg.content)}"')
-                await channel.send(f'{time} "{entry.user}" 刪除了 "{msg.guild}" 伺服器 "{str(msg.author)}" 的訊息, 內容: "{str(msg.content)}"')
+                time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
+                print(f'{time} "{entry.user}" 刪除了 "{msg.guild}" 伺服器 "{msg.channel}" 頻道 "{str(msg.author)}" 的訊息, 內容: "{str(msg.content)}"')
+                await channel.send(f'{time} "{entry.user}" 刪除了 "{msg.guild}" 伺服器 "{msg.channel}" 頻道 "{str(msg.author)}" 的訊息, 內容: "{str(msg.content)}"')
                 counter += 1
 
     """"""

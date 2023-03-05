@@ -4,14 +4,13 @@ from core.classes import Cog_Extension
 import asyncio, os, time, datetime, random, logging, requests
 import json, yaml
 
-time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
-
 with open('cmds/task/task.json', mode='r',encoding='utf8') as file:
     data = json.load(file)
 
 class Task(Cog_Extension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
         print(f'{time} Task load!')
         self.counter = 0
 

@@ -4,11 +4,10 @@ from core.classes import Cog_Extension
 import asyncio, os, time, datetime, random, logging, requests, sys
 import json, yaml
 
-time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
 log_time = datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')
 logging.basicConfig(filename=f'log/{log_time}.log', level=logging.INFO, format='[%(asctime)s %(levelname)s]: %(message)s')
 
-with open('setting.jsonc', mode='r',encoding='utf8') as setting:
+with open('setting.json', mode='r',encoding='utf8') as setting:
     data = json.load(setting)
 
 with open('version.json', mode='r',encoding='utf8') as v:
@@ -24,10 +23,13 @@ bot = commands.Bot(command_prefix=(str(data['prefix'])), intents=intents)
 
 @bot.event
 async def on_ready():
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     print(f'{time} >> Bot is online <<\n{time} 目前登入身份:', bot.user)
     await bot.change_presence(status=discord.Status(data['bot_status']), activity=discord.Game(data['bot_activity']))
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     print(f'{time} 正在同步斜線命令...')
     await asyncio.sleep(2) #單位: 秒
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     print(f'{time} 斜線命令同步完成\n{time} >> Bot is Ready <<\n{time} 目前版本為:', version['version'])
 
 @bot.event
@@ -62,6 +64,7 @@ async def restart(ctx):
 # cmds
 @bot.command()
 async def load(ctx, extension):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     if ctx.author.id == int(data['owner_id']):
         print(f'{time} Loading {extension} ...')
         bot.load_extension(f'cmds.{extension}')
@@ -71,6 +74,7 @@ async def load(ctx, extension):
 
 @bot.command()
 async def unload(ctx, extension):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     if ctx.author.id == int(data['owner_id']):
         print(f'{time} Un - Loading {extension} ...')
         bot.unload_extension(f'cmds.{extension}')
@@ -80,6 +84,7 @@ async def unload(ctx, extension):
 
 @bot.command()
 async def reload(ctx, extension):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     if ctx.author.id == int(data['owner_id']):
         print(f'{time} RE - Loading {extension} ...')
         bot.reload_extension(f'cmds.{extension}')
@@ -90,6 +95,7 @@ async def reload(ctx, extension):
 # modules
 @bot.command()
 async def load_mod(ctx, extension):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     if ctx.author.id == int(data['owner_id']):
         print(f'{time} Loading {extension} ...')
         bot.load_extension(f'modules.{extension}')
@@ -99,6 +105,7 @@ async def load_mod(ctx, extension):
 
 @bot.command()
 async def unload_mod(ctx, extension):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     if ctx.author.id == int(data['owner_id']):
         print(f'{time} Un - Loading {extension} ...')
         bot.unload_extension(f'modules.{extension}')
@@ -108,6 +115,7 @@ async def unload_mod(ctx, extension):
 
 @bot.command()
 async def reload_mod(ctx, extension):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
     if ctx.author.id == int(data['owner_id']):
         print(f'{time} RE - Loading {extension} ...')
         bot.reload_extension(f'modules.{extension}')
