@@ -68,8 +68,13 @@ class Slash(Cog_Extension):
 
     @commands.slash_command(description="ping我看我ㄉ延遲")
     async def ping(self, ctx):
-        await ctx.respond(f'機器人延遲 {round(self.bot.latency*1000)} ms\nAPI延遲 {round(self.bot.ws.latency*1000)} ms')
-
+        yt_api_url = 'https://www.googleapis.com/youtube/v3/search?key=' + data['yt_api_key']
+        response_yt_api = requests.get(yt_api_url)
+        if response_yt_api.status_code == 200:
+            await ctx.send(f'Discord延遲 {round(self.bot.latency*1000)} ms\nYouTube API延遲 {round(response_yt_api.elapsed.total_seconds()*1000)} ms')
+        else:
+            await ctx.send(f"網路錯誤, 請稍後再試")
+            
     @commands.slash_command(description="讓我幫你說話")
     async def say(self, ctx, msg):
         if msg != ("@everyone") and msg != ("@here"):
