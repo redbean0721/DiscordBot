@@ -1,0 +1,7 @@
+discord.py == 2.2.2
+py-cord == 2.4.0
+python-dotenv
+PyYAML
+requests
+typing
+youtube-dl == 2021.12.17
