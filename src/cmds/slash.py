@@ -88,8 +88,8 @@ class Slash(Cog_Extension):
     @commands.slash_command(description="清除訊息")
     @commands.has_permissions(manage_messages = True)
     async def clear(self, ctx, num: int):
-        await ctx.channel.purge(limit=num+1)
-        await ctx.respond(f'{ctx.message.author.mention} 已刪除 {num} 則訊息')
+        await ctx.channel.purge(limit=num)
+        await ctx.respond(f'{ctx.author.mention} 已刪除 {num} 則訊息')
 
     @commands.slash_command(description="隨機生成一串密碼")
     async def password(self, ctx, n_bytes: int = 18):
