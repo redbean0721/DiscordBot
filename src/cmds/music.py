@@ -47,37 +47,47 @@ class Music(Cog_Extension):
 
 # command to play sound from a youtube URL
     @commands.command(help="撥放音樂(url/搜尋關鍵字)")
-    async def play(self, ctx, msg):
+    async def play(self, ctx, *, msg):
         voice = get(self.bot.voice_clients, guild=ctx.guild)
-        if voice.is_playing():
-            await ctx.reply("機器人正在撥放音樂 (對列系統還沒寫)")
-        elif msg.startswith('http') and '://' in msg and self.bot:
-            YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
-            FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+        
+        if voice and voice.is_playing():
+            await ctx.reply("機器人正在撥放音樂")
+            return
+
+        if not voice:
+            await ctx.author.voice.channel.connect()
             voice = get(self.bot.voice_clients, guild=ctx.guild)
-            if not voice.is_playing():
+
+        with ctx.typing():
+            try:
+                YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': True, 'quiet': True}
+                FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn', 'quiet': True}
+
                 with YoutubeDL(YDL_OPTIONS) as ydl:
                     info = ydl.extract_info(msg, download=False)
-                URL = info['url']
-                voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-                voice.is_playing()
-                await ctx.reply('撥放中...')
-        else:
-            search = requests.get("https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + msg + '&key=' + data['yt_api_key'] + '&type=video&maxResults=1')
-            jdata = search.json()
-            url = "https://www.youtube.com/watch?v=" + jdata['items'][0]['id']['videoId']
+                    URL = info['url']
+                    source = await discord.FFmpegOpusAudio.from_probe(URL, **FFMPEG_OPTIONS)
+                    voice.play(source)
+                    await ctx.reply(f"正在播放 `{info['title']}`")
+            except Exception as e:
+                await ctx.reply(f"發生錯誤: {e}")
 
-            # use 'url' to play music
-            YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
-            FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
-            voice = get(self.bot.voice_clients, guild=ctx.guild)
-            if not voice.is_playing():
-                with YoutubeDL(YDL_OPTIONS) as ydl:
-                    info = ydl.extract_info(url, download=False)
-                URL = info['url']
-                voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-                voice.is_playing()
-                await ctx.reply('撥放中...')
+        # else:
+        #     search = requests.get("https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + msg + '&key=' + data['yt_api_key'] + '&type=video&maxResults=1')
+        #     jdata = search.json()
+        #     url = "https://www.youtube.com/watch?v=" + jdata['items'][0]['id']['videoId']
+
+        #     # use 'url' to play music
+        #     YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+        #     FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+        #     voice = get(self.bot.voice_clients, guild=ctx.guild)
+        #     if not voice.is_playing():
+        #         with YoutubeDL(YDL_OPTIONS) as ydl:
+        #             info = ydl.extract_info(url, download=False)
+        #         URL = info['url']
+        #         voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+        #         voice.is_playing()
+        #         await ctx.reply('撥放中...')
 
     @commands.command(help="搜尋YouTube影片")
     async def search(self, ctx, search):

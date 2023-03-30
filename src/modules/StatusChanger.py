@@ -16,12 +16,6 @@ class StatusUpdater(Cog_Extension):
         print(f'{time} StatusChanger module ready!')
         self.status = 0
 
-# class StatusUpdater(Cog_Extension):
-#     def __init__(self, bot):
-#         print("StatusChanger module ready!")
-#         self.bot = bot
-#         self.status = 0
-
     @commands.Cog.listener()
     async def on_ready(self):
         if not self.update_status.is_running():

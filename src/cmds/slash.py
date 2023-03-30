@@ -71,9 +71,9 @@ class Slash(Cog_Extension):
         yt_api_url = 'https://www.googleapis.com/youtube/v3/search?key=' + data['yt_api_key']
         response_yt_api = requests.get(yt_api_url)
         if response_yt_api.status_code == 200:
-            await ctx.send(f'Discord延遲 {round(self.bot.latency*1000)} ms\nYouTube API延遲 {round(response_yt_api.elapsed.total_seconds()*1000)} ms')
+            await ctx.respond(f'Discord延遲 {round(self.bot.latency*1000)} ms\nYouTube API延遲 {round(response_yt_api.elapsed.total_seconds()*1000)} ms')
         else:
-            await ctx.send(f"網路錯誤, 請稍後再試")
+            await ctx.respond(f"網路錯誤, 請稍後再試")
             
     @commands.slash_command(description="讓我幫你說話")
     async def say(self, ctx, msg):
@@ -97,7 +97,7 @@ class Slash(Cog_Extension):
             return await ctx.respond("請輸入 3-1400 內的數字")
         if hasattr(ctx, 'guild') and ctx.guild is not None:
             await ctx.respond(f"密碼已發送至您的私人訊息", ephemeral=True)
-        await ctx.author.respond(f"🎁 **這是您的密碼:**\n```{secrets.token_urlsafe(n_bytes)}```")
+        await ctx.author.send(f"🎁 **這是您的密碼:**\n```{secrets.token_urlsafe(n_bytes)}```")
 
     @commands.slash_command(description="關於我")
     async def info(self, ctx):
