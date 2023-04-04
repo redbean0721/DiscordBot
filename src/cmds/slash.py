@@ -101,6 +101,8 @@ class Slash(Cog_Extension):
 
     @commands.slash_command(description="關於我")
     async def info(self, ctx):
+        yt_api_url = 'https://www.googleapis.com/youtube/v3/search?key=' + data['yt_api_key']
+        response_yt_api = requests.get(yt_api_url)
         embed=discord.Embed(title="關於我", description=f'{self.bot.user}', color=0x00fbff, timestamp= datetime.datetime.now())
         embed.add_field(name="開發者 Developers", value="redbean0721#5582", inline=False)
         embed.add_field(name="源碼 Source", value="https://github.com/redbean0721/DiscordBot", inline=False)
@@ -110,7 +112,7 @@ class Slash(Cog_Extension):
         embed.add_field(name="指令 Prefix", value=(data['prefix']), inline=False)
         embed.add_field(name="服務中的伺服器 Server count", value=f"{len(self.bot.guilds)}", inline=False)
         embed.add_field(name="機器人延遲", value=f'{round(self.bot.latency*1000)} ms', inline=False)
-        embed.add_field(name="API延遲", value=f'{round(self.bot.ws.latency*1000)} ms', inline=False)
+        embed.add_field(name="API延遲", value=f'{round(response_yt_api.elapsed.total_seconds()*1000)} ms', inline=False)
         embed.set_footer(text="Made with ❤")
         await ctx.respond(embed=embed)
 
