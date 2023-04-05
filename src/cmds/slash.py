@@ -122,56 +122,57 @@ class Slash(Cog_Extension):
 
     """Music""" # OK
 
-    @commands.slash_command(description="加入你所在的語音頻道")
-    async def join(self, ctx):
-        if ctx.author.voice is None:
-            await ctx.respond("請先加入語音頻道")
-        voice_channel = ctx.author.voice.channel
-        if ctx.voice_client is None:
-            await voice_channel.connect()
-            await ctx.respond(f'加入了 `{ctx.author}` 的語音頻道')
-        else:
-            await ctx.voice_client.move_to(voice_channel)
+#     @commands.slash_command(description="加入你所在的語音頻道")
+#     async def join(self, ctx):
+#         if ctx.author.voice is None:
+#             await ctx.respond("請先加入語音頻道")
+#         voice_channel = ctx.author.voice.channel
+#         if ctx.voice_client is None:
+#             await voice_channel.connect()
+#             await ctx.respond(f'加入了 `{ctx.author}` 的語音頻道')
+#         else:
+#             await ctx.voice_client.move_to(voice_channel)
 
-    @commands.slash_command(description="讓我離開語音頻道")
-    async def leave(self, ctx):
-        await ctx.voice_client.disconnect()
-        await ctx.respond(f'`{ctx.author}` 讓我離開語音頻道 :confused:') # .mention
-        print("Bot Command: leave from User {}".format(ctx.author))
+#     @commands.slash_command(description="讓我離開語音頻道")
+#     async def leave(self, ctx):
+#         await ctx.voice_client.disconnect()
+#         await ctx.respond(f'`{ctx.author}` 讓我離開語音頻道 :confused:') # .mention
+#         print("Bot Command: leave from User {}".format(ctx.author))
 
-    @commands.slash_command(description="撥放音樂(url/搜尋關鍵字)")
-    async def play(self, ctx, msg):
-        voice = get(self.bot.voice_clients, guild=ctx.guild)
-        if voice.is_playing():
-            await ctx.respond("機器人正在撥放音樂 (對列系統還沒寫)")
-        elif msg.startswith('http') and '://' in msg and self.bot:
-            YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
-            FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
-            voice = get(self.bot.voice_clients, guild=ctx.guild)
-            if not voice.is_playing():
-                with YoutubeDL(YDL_OPTIONS) as ydl:
-                    info = ydl.extract_info(msg, download=False)
-                URL = info['url']
-                voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-                voice.is_playing()
-                await ctx.respond('撥放中...')
+#     @commands.slash_command(description="撥放音樂(url/搜尋關鍵字)")
+#     async def play(self, ctx, msg):
+#         await ctx.respond("命令維修中")
+#         # voice = get(self.bot.voice_clients, guild=ctx.guild)
+#         # if voice.is_playing():
+#         #     await ctx.respond("機器人正在撥放音樂 (對列系統還沒寫)")
+#         # elif msg.startswith('http') and '://' in msg and self.bot:
+#         #     YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+#         #     FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+#         #     voice = get(self.bot.voice_clients, guild=ctx.guild)
+#         #     if not voice.is_playing():
+#         #         with YoutubeDL(YDL_OPTIONS) as ydl:
+#         #             info = ydl.extract_info(msg, download=False)
+#         #         URL = info['url']
+#         #         voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+#         #         voice.is_playing()
+#         #         await ctx.respond('撥放中...')
 
-        else:
-            search = requests.get("https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + msg + '&key=' + data['yt_api_key'] + '&type=video&maxResults=1')
-            jdata = search.json()
-            url = "https://www.youtube.com/watch?v=" + jdata['items'][0]['id']['videoId']
+#         # else:
+#         #     search = requests.get("https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + msg + '&key=' + data['yt_api_key'] + '&type=video&maxResults=1')
+#         #     jdata = search.json()
+#         #     url = "https://www.youtube.com/watch?v=" + jdata['items'][0]['id']['videoId']
 
-            # use 'url' to play music
-            YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
-            FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
-            voice = get(self.bot.voice_clients, guild=ctx.guild)
-            if not voice.is_playing():
-                with YoutubeDL(YDL_OPTIONS) as ydl:
-                    info = ydl.extract_info(url, download=False)
-                URL = info['url']
-                voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-                voice.is_playing()
-                await ctx.respond('撥放中...')
+#         #     # use 'url' to play music
+#         #     YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+#         #     FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+#         #     voice = get(self.bot.voice_clients, guild=ctx.guild)
+#         #     if not voice.is_playing():
+#         #         with YoutubeDL(YDL_OPTIONS) as ydl:
+#         #             info = ydl.extract_info(url, download=False)
+#         #         URL = info['url']
+#         #         voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+#         #         voice.is_playing()
+#         #         await ctx.respond('撥放中...')
 
     @commands.slash_command(description="搜尋YouTube影片")
     async def search(self, ctx, search):
@@ -180,32 +181,32 @@ class Slash(Cog_Extension):
         url = "https://www.youtube.com/watch?v=" + jdata['items'][0]['id']['videoId']
         await ctx.respond(url)
 
-# command to resume voice if it is paused
-    @commands.slash_command(description="恢復播放")
-    async def resume(self, ctx):
-        voice = get(self.bot.voice_clients, guild=ctx.guild)
+# # command to resume voice if it is paused
+#     @commands.slash_command(description="恢復播放")
+#     async def resume(self, ctx):
+#         voice = get(self.bot.voice_clients, guild=ctx.guild)
 
-        if not voice.is_playing():
-            voice.resume()
-            await ctx.respond('播放已恢復')
+#         if not voice.is_playing():
+#             voice.resume()
+#             await ctx.respond('播放已恢復')
 
-    # command to pause voice if it is playing
-    @commands.slash_command(description="暫停播放")
-    async def pause(self, ctx):
-        voice = get(self.bot.voice_clients, guild=ctx.guild)
+#     # command to pause voice if it is playing
+#     @commands.slash_command(description="暫停播放")
+#     async def pause(self, ctx):
+#         voice = get(self.bot.voice_clients, guild=ctx.guild)
 
-        if voice.is_playing():
-            voice.pause()
-            await ctx.respond('播放已暫停')
+#         if voice.is_playing():
+#             voice.pause()
+#             await ctx.respond('播放已暫停')
 
-    # command to stop voice
-    @commands.slash_command(description="停止播放")
-    async def stop(self, ctx):
-        voice = get(self.bot.voice_clients, guild=ctx.guild)
+#     # command to stop voice
+#     @commands.slash_command(description="停止播放")
+#     async def stop(self, ctx):
+#         voice = get(self.bot.voice_clients, guild=ctx.guild)
 
-        if voice.is_playing():
-            voice.stop()
-            await ctx.respond('停止撥放...')
+#         if voice.is_playing():
+#             voice.stop()
+#             await ctx.respond('停止撥放...')
         
     """"""
 

@@ -3,91 +3,76 @@ from discord.ext import commands
 from core.classes import Cog_Extension
 import asyncio, os, time, datetime, random, logging, requests
 import json, yaml
-# load our local env so we dont have the token in public
-from discord.ext import commands
-from discord.utils import get
-from discord import FFmpegPCMAudio
-from discord import TextChannel
-from youtube_dl import YoutubeDL
+import pytube as pt
 
 with open('setting.json', mode='r',encoding='utf8') as file:
     data = json.load(file)
 
 class Music(Cog_Extension):
-    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
-    print(f'{time} Music load!')
+    def __init__(self, bot):
+        time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
+        print(f'{time} Music ready!')
+        self.bot = bot
 
-# command for bot to join the channel of the user, if the bot has already joined and is in a different channel, it will move to the channel the user is in
-    @commands.command(help="加入你所在的語音頻道")
-    async def join(self, ctx,):
-        channel = ctx.message.author.voice.channel
-        voice = get(self.bot.voice_clients, guild=ctx.guild)
-        if voice and voice.is_connected():
-            await voice.move_to(channel)
-        else:
-            voice = await channel.connect()
-            await ctx.reply(f'加入了 `{ctx.author}` 的語音頻道')
+        self.is_playing = False
+        self.is_paused = False
 
-    @commands.command(help="讓我離開語音頻道")
-    async def leave(self, ctx):
-        voice_client = ctx.message.guild.voice_client
+        self.current_song = None
+
+        # [[song, channel]]
+        self.music_queue = []
+        self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+
+        self.vc = None
+
+     #searching the item on youtube
+    def search_yt(self, item):
         try:
-            voice_client = ctx.message.guild.voice_client
-            if voice_client.is_connected():
-                await voice_client.disconnect()
-                await ctx.reply(f'{ctx.message.author} 讓我離開語音頻道 :confused:')
-                print("Bot Command: leave from User {}".format(ctx.message.author))
+            video = pt.Search(item).results[0]
+            return {'source': video.streams.get_audio_only().url, 'title': video.title}
+        except Exception:
+            print('搜索 youtube 時發生異常')
+            return False
+
+    def play_next(self):
+        if len(self.music_queue) > 0:
+            self.is_playing = True
+
+            #get the first url
+            m_url = self.music_queue[0][0]['source']
+
+            #remove the first element as you are currently playing it
+            self.current_song = self.music_queue.pop(0)
+
+            self.vc.play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
+        else:
+            self.is_playing = False
+            self.current_song = None
+
+    # infinite loop checking 
+    async def play_music(self, ctx):
+        if len(self.music_queue) > 0:
+            self.is_playing = True
+
+            m_url = self.music_queue[0][0]['source']
+
+            #try to connect to voice channel if you are not already connected
+            if self.vc == None or not self.vc.is_connected():
+                self.vc = await self.music_queue[0][1].connect()
+
+                #in case we fail to connect
+                if self.vc == None:
+                    await ctx.send("Could not connect to the voice channel")
+                    return
             else:
-                await ctx.send("Error could not leave voice channel")
-                await ctx.reply(e)
-        except Exception as e:
-            # print("Error could not leave voice channel")
-            await ctx.reply("機器人沒有在語音頻道 :face_with_raised_eyebrow: ")
-            # print(e)
+                await self.vc.move_to(self.music_queue[0][1])
+            
+            #remove the first element as you are currently playing it
+            self.current_song = self.music_queue.pop(0)
 
-# command to play sound from a youtube URL
-    @commands.command(help="撥放音樂(url/搜尋關鍵字)")
-    async def play(self, ctx, *, msg):
-        voice = get(self.bot.voice_clients, guild=ctx.guild)
-        
-        if voice and voice.is_playing():
-            await ctx.reply("機器人正在撥放音樂")
-            return
-
-        if not voice:
-            await ctx.author.voice.channel.connect()
-            voice = get(self.bot.voice_clients, guild=ctx.guild)
-
-        with ctx.typing():
-            try:
-                YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': True, 'quiet': True}
-                FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn', 'quiet': True}
-
-                with YoutubeDL(YDL_OPTIONS) as ydl:
-                    info = ydl.extract_info(msg, download=False)
-                    URL = info['url']
-                    source = await discord.FFmpegOpusAudio.from_probe(URL, **FFMPEG_OPTIONS)
-                    voice.play(source)
-                    await ctx.reply(f"正在播放 `{info['title']}`")
-            except Exception as e:
-                await ctx.reply(f"發生錯誤: {e}")
-
-        # else:
-        #     search = requests.get("https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + msg + '&key=' + data['yt_api_key'] + '&type=video&maxResults=1')
-        #     jdata = search.json()
-        #     url = "https://www.youtube.com/watch?v=" + jdata['items'][0]['id']['videoId']
-
-        #     # use 'url' to play music
-        #     YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
-        #     FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
-        #     voice = get(self.bot.voice_clients, guild=ctx.guild)
-        #     if not voice.is_playing():
-        #         with YoutubeDL(YDL_OPTIONS) as ydl:
-        #             info = ydl.extract_info(url, download=False)
-        #         URL = info['url']
-        #         voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-        #         voice.is_playing()
-        #         await ctx.reply('撥放中...')
+            self.vc.play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
+        else:
+            self.is_playing = False
 
     @commands.command(help="搜尋YouTube影片")
     async def search(self, ctx, search):
@@ -96,32 +81,137 @@ class Music(Cog_Extension):
         url = "https://www.youtube.com/watch?v=" + jdata['items'][0]['id']['videoId']
         await ctx.send(url)
 
-# command to resume voice if it is paused
-    @commands.command(help="恢復播放")
-    async def resume(self, ctx):
-        voice = get(self.bot.voice_clients, guild=ctx.guild)
+    @commands.command(help="撥放音樂(url/搜尋關鍵字)")
+    async def play(self, ctx, *args):
+        # print(self.is_playing, self.is_paused)
+        print('play command')
+        query = " ".join(args)
+        
+        if ctx.author.voice is None:
+            #you need to be connected so that the bot knows where to go
+            await ctx.send("你先加入語音頻道!")
+        elif self.is_paused:
+            self.vc.resume()
+        else:
+            song = self.search_yt(query)
+            title = "title"  # use this to access the title of the song
+            if type(song) == type(True):
+                await ctx.send("無法下載歌曲, 格式不正確請嘗試其他關鍵字, 這可能是由於播放列表或直播格式所致")
+            else:
+                await ctx.send(f'已將 **{song[title]}** 加入對列中')
+                self.music_queue.append([song, ctx.author.voice.channel])
+                
+                if self.is_playing == False:
+                    await self.play_music(ctx)
 
-        if not voice.is_playing():
-            voice.resume()
-            await ctx.reply('播放已恢復')
+    @commands.command(help="將歌曲添加到隊列的最前面")
+    async def priority_play(self, ctx, *args):
+        print('priority_play command')
+        query = " ".join(args)
+        
+        if ctx.author.voice is None:
+            #you need to be connected so that the bot knows where to go
+            await ctx.send("你先加入語音頻道!")
+        elif self.is_paused:
+            self.vc.resume()
+        else:
+            if ctx.author.guild_permissions.administrator == False:
+                await ctx.send("你沒有權限!")
+                return
+            else:
+                await ctx.send("Hello, admin")
+            song = self.search_yt(query)
+            title = "title"  # use this to access the title of the song
+            if type(song) == type(True):
+                await ctx.send("無法下載歌曲, 格式不正確請嘗試其他關鍵字, 這可能是由於播放列表或直播格式所致")
+            else:
+                await ctx.send(f'已將 **{song[title]}** 加入對列中')
+                self.music_queue.insert(0, [song, ctx.author.voice.channel])
+                if self.is_playing == False:
+                    await self.play_music(ctx)
 
-    # command to pause voice if it is playing
+    @commands.command(help="顯示當前正在播放的歌曲")
+    async def current(self, ctx):
+        print('current command')
+        if self.is_playing:
+            # debugging
+            if self.current_song is None:
+                print('ERROR, 當前歌曲沒有, 但正在播放')
+                return
+            await ctx.send(f'正在播放: {self.current_song[0]["title"]}')
+        else:
+            await ctx.send("目前沒有正在播放的歌曲")
+
     @commands.command(help="暫停播放")
-    async def pause(self, ctx):
-        voice = get(self.bot.voice_clients, guild=ctx.guild)
+    async def pause(self, ctx, *args):
+        print('pause command')
+        if self.is_playing:
+            await ctx.send("Pausing playback")
+            self.is_playing = False
+            self.is_paused = True
+            self.vc.pause()
 
-        if voice.is_playing():
-            voice.pause()
-            await ctx.reply('播放已暫停')
+    @commands.command(help="恢復播放")
+    async def resume(self, ctx, *args):
+        print('resume command')
+        if self.is_paused:
+            await ctx.send("Resuming playback")
+            self.is_paused = False
+            self.is_playing = True
+            self.vc.resume()
 
-    # command to stop voice
-    @commands.command(help="停止播放")
-    async def stop(self, ctx):
-        voice = get(self.bot.voice_clients, guild=ctx.guild)
+    @commands.command(help="跳過當前歌曲")
+    async def skip(self, ctx):
+        print('skip command')
+        if self.vc != None and self.vc:
+            await ctx.send("Skipping song")
+            self.vc.stop()
+            # try to play next in queue if it exists
+            await self.play_music(ctx)
 
-        if voice.is_playing():
-            voice.stop()
-            await ctx.reply('停止撥放...')
+    @commands.command(help="查看對列")
+    async def queue(self, ctx):
+        print('queue command')
+        retval = "Song Queue: ("
+        if len(self.music_queue) < 10:
+            retval += f'{len(self.music_queue)}/'
+        else:
+            retval += '10/'
+        retval += f'{len(self.music_queue)})\n'
+        for i in range(0, len(self.music_queue)):
+            # display first 10 songs in the queue
+            if i >= 10: 
+                break
+            retval += self.music_queue[i][0]['title'] + "\n"
+
+        if retval:
+            await ctx.send(retval)
+        else:
+            await ctx.send("對列是空的")
+
+    @commands.command(help="清除對列所有歌曲")
+    async def clear_quere(self, ctx):
+        print('clear command')
+        if self.vc != None and self.is_playing:
+            self.vc.stop()
+        self.music_queue = []
+        self.current_song = None
+        await ctx.send("Music queue cleared")
+
+    @commands.command(help="讓我離開語音頻道")
+    async def leave(self, ctx):
+        print('leave command')
+        self.is_playing = False
+        self.is_paused = False
+        self.music_queue = []
+        self.current_song = None
+        await ctx.send(f'{ctx.message.author} 讓我離開語音頻道 :confused:')
+        await self.vc.disconnect()
 
 def setup(bot):
     bot.add_cog(Music(bot))
+
+
+
+
+# 內容參考自 https://github.com/KingTingTheGreat/DiscordBot 的 music_cog.py
