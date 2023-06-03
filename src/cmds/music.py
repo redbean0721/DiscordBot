@@ -172,7 +172,7 @@ class Music(Cog_Extension):
     @commands.command(help="查看對列")
     async def queue(self, ctx):
         print('queue command')
-        retval = "Song Queue: ("
+        retval = "接著撥放: ("
         if len(self.music_queue) < 10:
             retval += f'{len(self.music_queue)}/'
         else:
@@ -185,12 +185,13 @@ class Music(Cog_Extension):
             retval += self.music_queue[i][0]['title'] + "\n"
 
         if retval:
-            await ctx.send(retval)
+            await ctx.send(f'正在播放:\n{self.current_song[0]["title"]}\n\n{retval}')
+            # await ctx.send(retval)
         else:
             await ctx.send("對列是空的")
 
     @commands.command(help="清除對列所有歌曲")
-    async def clear_quere(self, ctx):
+    async def quere_c(self, ctx):
         print('clear command')
         if self.vc != None and self.is_playing:
             self.vc.stop()
