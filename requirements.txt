@@ -5,3 +5,4 @@ PyYAML
 requests
 typing
 youtube-dl == 2021.12.17
+pytube == 12.1.3
