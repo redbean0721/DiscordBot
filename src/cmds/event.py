@@ -183,10 +183,18 @@ class Event(Cog_Extension):
         counter = 1
         async for entry in msg.guild.audit_logs(action=discord.AuditLogAction.message_delete):
             if counter ==1:
+                attachments = msg.attachments
+                attachment_urls = [attachment.url for attachment in attachments]
                 # await channel.send(entry.user.name)
                 time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
                 print(f'{time} "{entry.user}" 刪除了 "{msg.guild}" 伺服器 "{msg.channel}" 頻道 "{str(msg.author)}" 的訊息, 內容: "{str(msg.content)}"')
                 await channel.send(f'{time} "{entry.user}" 刪除了 "{msg.guild}" 伺服器 "{msg.channel}" 頻道 "{str(msg.author)}" 的訊息, 內容: "{str(msg.content)}"')
+                if attachment_urls:
+                    print(f'{time} 刪除的訊息中包含以下附件:')
+                    for url in attachment_urls:
+                        print(url)
+                    await channel.send(f'{time} 刪除的訊息中包含以下附件:')
+                    await channel.send('\n'.join(attachment_urls))
                 counter += 1
 
     """"""
