@@ -40,10 +40,10 @@ class Event(Cog_Extension):
 
     @commands.Cog.listener()
     async def on_message(self, msg):
-        egg = ['誰叫我', '我在這~', '怎麼了 <:ha:1047493102170021898>', 'none', 'none', 'none']
-        random_choice_egg = random.choice(egg)
-        if 'ㄒㄧㄠˊ 蛋蛋' in  msg.content and msg.author != self.bot.user and random_choice_egg != 'none':
-            await msg.channel.send(random_choice_egg)
+        kg = ['誰叫我', '我在這~', '怎麼了 <:ha:1047493102170021898>', 'none', 'none', 'none']
+        random_choice_kg = random.choice(kg)
+        if self.bot.user in msg.mentions and msg.author != self.bot.user and random_choice_kg != 'none':
+            await msg.channel.send(random_choice_kg)         
 
         good_morning = ['安', '安安', 'none', 'none']
         random_choice_good_morning = random.choice(good_morning)

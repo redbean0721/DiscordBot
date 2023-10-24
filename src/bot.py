@@ -40,7 +40,8 @@ async def on_command_error(ctx, command_error):
     if isinstance(command_error, commands.errors.MissingRequiredArgument):
         await ctx.send(f'缺少必要的參數: {command_error}')
     elif isinstance(command_error, commands.errors.CommandNotFound):
-        await ctx.send("指令未找到")
+        pass
+        # await ctx.send("指令未找到")
     else:
         await ctx.send(f'發生錯誤: {command_error}')
 

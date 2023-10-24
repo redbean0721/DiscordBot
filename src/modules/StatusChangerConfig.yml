@@ -3,6 +3,7 @@ Change-Interval: 25     # 單位：秒
                         # 建議至少 15 秒，因為 Discord 上的更改不是即時的
 
 Status-list:
+  - "Server count: {server_count}"
   - "Managing the server"
   - "Use !help for help"
 #  - 那個臭起額吼

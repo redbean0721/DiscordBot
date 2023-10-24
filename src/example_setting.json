@@ -1,5 +1,6 @@
 {
     "owner_id": "owner_id",
+    "developers": "owner",
     "prefix": "!",
     "bot_status": "online",
     "bot_activity": "HA",

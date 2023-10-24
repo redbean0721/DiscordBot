@@ -62,6 +62,17 @@ class Slash(Cog_Extension):
 
     """Main"""
 
+    @commands.slash_command(description="指令列表")
+    async def help(self, ctx):
+        # await ctx.respond(f'該功能目前尚未完善，請等候...')
+        embed=discord.Embed(title="賣kg鞍的良心商家 的指令列表", description="/about - 顯示關於機器人的訊息\n/ping - 查看機器人ㄉ延遲", color=0xb423ff, timestamp= datetime.datetime.now())
+        embed.add_field(name="管理:", value="/kick - 踢出成員\n/ban - 封鎖成員\n/unban - 解成封鎖成員", inline=False)
+        embed.add_field(name="主要:", value="/help - 指令列表\n/hi - 跟你say Hellow\n/ping - ping我看我ㄉ延遲\n/say - 讓我幫你說話\n/clear - 清除訊息(限有權限\n/password - 隨機生成一串密碼\n/info - 關於我", inline=False)
+        embed.add_field(name="Music:", value="目前停用此功能", inline=False)
+        embed.add_field(name="歡迎加入支援群組", value="https://discord.gg/9hwuNYXA4q", inline=False)
+        embed.set_footer(text="Made with ❤")
+        await ctx.respond(embed=embed)
+
     @commands.slash_command(description="跟你say Hellow")
     async def hi(self, ctx):
         await ctx.respond(random.choice(['誰叫我', '我在這~', '怎麼了', '?']))
@@ -77,13 +88,13 @@ class Slash(Cog_Extension):
             
     @commands.slash_command(description="讓我幫你說話")
     async def say(self, ctx, msg):
-        if msg != ("@everyone") and msg != ("@here"):
+        if ("@everyone") not in msg and ("@here") not in msg:
             await ctx.respond(f'訊息已傳送', ephemeral=True)
             async with ctx.typing():
-                await asyncio.sleep(4)
+                await asyncio.sleep(3)
             await ctx.send(msg)
         else:
-            await ctx.respond(f'{msg.author.mention}你不可以@everyone或@here!!')
+            await ctx.respond(f'{ctx.author.mention} 你不可以讓我tag everyone或here!!')
 
     @commands.slash_command(description="清除訊息")
     @commands.has_permissions(manage_messages = True)
@@ -94,7 +105,7 @@ class Slash(Cog_Extension):
     @commands.slash_command(description="隨機生成一串密碼")
     async def password(self, ctx, n_bytes: int = 18):
         if n_bytes not in range(3, 1401):
-            return await ctx.respond("請輸入 3-1400 內的數字")
+            return await ctx.respond("請輸入 3-1400 內的數字(請重新使用指令)")
         if hasattr(ctx, 'guild') and ctx.guild is not None:
             await ctx.respond(f"密碼已發送至您的私人訊息", ephemeral=True)
         await ctx.author.send(f"🎁 **這是您的密碼:**\n```{secrets.token_urlsafe(n_bytes)}```")
@@ -104,7 +115,7 @@ class Slash(Cog_Extension):
         yt_api_url = 'https://www.googleapis.com/youtube/v3/search?key=' + data['yt_api_key']
         response_yt_api = requests.get(yt_api_url)
         embed=discord.Embed(title="關於我", description=f'{self.bot.user}', color=0x00fbff, timestamp= datetime.datetime.now())
-        embed.add_field(name="開發者 Developers", value="redbean0721#5582", inline=False)
+        embed.add_field(name="開發者 Developers", value=(data['developers']), inline=False)
         embed.add_field(name="源碼 Source", value="https://github.com/redbean0721/DiscordBot", inline=False)
         embed.add_field(name="協助 Support Server", value="https://discord.gg/9hwuNYXA4q", inline=True)
         embed.add_field(name="版本 Version", value=(version['version']), inline=False)

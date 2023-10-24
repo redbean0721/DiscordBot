@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext import tasks
 from core.classes import Cog_Extension
+from core.classes import Cog_Modules
 import asyncio, os, datetime, random, logging, requests
 import json, yaml
 
@@ -9,12 +10,16 @@ config = yaml.safe_load(open("modules\\StatusChangerConfig.yml", 'r', encoding="
 
 interval = config.get("Change-Interval")
 
-class StatusUpdater(Cog_Extension):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
-        print(f'{time} StatusChanger module ready!')
-        self.status = 0
+# class StatusUpdater(Cog_Extension):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
+#         print(f'{time} StatusChanger module ready!')
+#         self.status = 0
+
+class StatusUpdater(Cog_Modules):
+    time = datetime.datetime.now().strftime('[%Y/%m/%d %H:%M:%S INFO]:')
+    print(f'{time} StatusChanger module ready!')
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -27,7 +32,9 @@ class StatusUpdater(Cog_Extension):
         if self.status == len(config.get("Status-list")):
             self.status = 0
 
-        status_message = config.get("Status-list")[self.status]
+        message = config.get("Status-list")[self.status]
+        server_count = len(self.bot.guilds)
+        status_message = message.format(server_count=server_count)
 
         await self.bot.change_presence(activity=discord.Game(name=status_message, type=3))
 
