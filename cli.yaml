@@ -1,0 +1,51 @@
+aliases:
+  "?": "help"
+
+commands:
+  stop:
+    description: "停止 bot"
+    usage: "stop"
+    group: "基礎"
+    handler: "handle_stop"
+  
+  restart:
+    description: "重啟 bot"
+    usage: "restart"
+    group: "基礎"
+    handler: "handle_restart"
+  
+  help:
+    description: "顯示所有可用指令"
+    usage: "help / ?"
+    group: "基礎"
+    handler: "handle_help"
+  
+  status:
+    description: "顯示 bot 狀態"
+    usage: "status"
+    group: "基礎"
+    handler: "handle_status"
+  
+  load:
+    description: "載入 Cog 模組"
+    usage: "load <extension>"
+    group: "管理"
+    handler: "handle_load"
+  
+  unload:
+    description: "卸載 Cog 模組"
+    usage: "unload <extension>"
+    group: "管理"
+    handler: "handle_unload"
+  
+  reload:
+    description: "重新載入 Cog 模組"
+    usage: "reload <extension>"
+    group: "管理"
+    handler: "handle_reload"
+  
+  ban:
+    description: "封鎖指定使用者"
+    usage: "ban <guild_id> <user_id> [reason]"
+    group: "管理"
+    handler: "handle_ban"
